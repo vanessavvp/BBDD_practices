@@ -1,0 +1,380 @@
+SQL> /* PRACTICA 6 - CONSULTAS AVANZADAS
+SQL> REALIZAR CONSULTAS CON MANEJO DE FECHAS, EXPRESIONES, AGRUPAMIENTOS, FUNCIONES DE
+SQL> GRUPO, DISCRIMINACION DE GRUPOS...
+SQL> 
+SQL> ASIGNATURA: BASES DE DATOS
+SQL> AUTORA: VANESSA VALENTINA VILLALBA PEREZ
+SQL> UNIVERSIDAD DE LA LAGUNA: */
+SQL> -- APARTADO 1:
+SQL> SELECT SYSDATE
+  2  FROM DUAL;
+
+SYSDATE                                                                         
+---------                                                                       
+13-JAN-21                                                                       
+
+SQL> -- APARTADO 2:
+SQL> SELECT TO_CHAR(SYSDATE,'HH:MI:SS')
+  2  FROM DUAL;
+
+TO_CHAR(                                                                        
+--------                                                                        
+07:21:11                                                                        
+
+SQL> -- APARTADO 3:
+SQL> SELECT TO_CHAR(SYSDATE,'WW-DD-MM-YYYY')
+  2  FROM DUAL;
+
+TO_CHAR(SYSDA                                                                   
+-------------                                                                   
+02-13-01-2021                                                                   
+
+SQL> -- CORRECION APARTADO 3:
+SQL> SELECT TO_CHAR(SYSDATE,'DAY-DD-MM-YYYY)
+  2  FROM DUAL;
+ERROR:
+ORA-01756: quoted string not properly terminated 
+
+
+SQL> SELECT TO_CHAR(SYSDATE,'DAY-DD-MM-YYYY')
+  2  FROM DUAL;
+
+TO_CHAR(SYSDATE,'DAY-DD-MM-YYYY')                                               
+-----------------------------------------------                                 
+WEDNESDAY-13-01-2021                                                            
+
+SQL> -- APARTADO 4:
+SQL> SELECT TO_CHAR(SYSDATE,'HH24:MI:SS')
+  2  FROM DUAL;
+
+TO_CHAR(                                                                        
+--------                                                                        
+19:23:47                                                                        
+
+SQL> -- APARTADO 5:
+SQL> SELECT CURRENT_DATE - FI
+  2  FROM PLAN_DOCENTE
+  3  WHERE CAS = 11 AND DNI = 8888;
+
+CURRENT_DATE-FI                                                                 
+---------------                                                                 
+     4152.80957                                                                 
+
+SQL> -- APARTADO 6:
+SQL> SELECT DISTINCT P
+  2  FROM PROFESOR NATURAL JOIN PLAN_DOCENTE
+  3  WHERE(FF IS NULL AND((CURRENT_DATE - FI) > 365)) OR (FF IS NOT NULL AND (FF - FI) > 365);
+
+P                                                                               
+------------------------------------------------------------                    
+MARIO                                                                           
+JUAN                                                                            
+PEDRO                                                                           
+FRANCISCO                                                                       
+SOLEDAD                                                                         
+CARLOS                                                                          
+IVAN                                                                            
+CARMEN                                                                          
+DAVID                                                                           
+JOSE MANUEL                                                                     
+ANGELA                                                                          
+
+11 rows selected.
+
+SQL> SELECT DISTINCT P
+  2  FROM PROFESOR NATURAL JOIN PLAN_DOCENTE
+  3  WHERE(FF IS NULL AND((CURRENT_DATE - FI) > 365)) OR (FF IS NOT NULL AND ((FF - FI) > 365));
+
+P                                                                               
+------------------------------------------------------------                    
+MARIO                                                                           
+JUAN                                                                            
+PEDRO                                                                           
+FRANCISCO                                                                       
+SOLEDAD                                                                         
+CARLOS                                                                          
+IVAN                                                                            
+CARMEN                                                                          
+DAVID                                                                           
+JOSE MANUEL                                                                     
+ANGELA                                                                          
+
+11 rows selected.
+
+SQL> -- APARTADO 7:
+SQL> SELECT COUNT(P)
+  2  FROM DEPARTAMENTO NATURAL JOIN AREA NATURAL JOIN PROFESOR
+  3  WHERE D = 'ASTROFISICA';
+
+  COUNT(P)                                                                      
+----------                                                                      
+         1                                                                      
+
+SQL> SELECT COUNT(P) 'PROFESORES DEL DEPARTAMENTO ASTROFISICA'
+  2  FROM DEPARTAMENTO NATURAL JOIN AREA NATURAL JOIN PROFESOR
+  3  WHERE D = 'ASTROFISICA';
+SELECT COUNT(P) 'PROFESORES DEL DEPARTAMENTO ASTROFISICA'
+                *
+ERROR at line 1:
+ORA-00923: FROM keyword not found where expected 
+
+
+SQL> SELECT COUNT(P) PROFESORES DEL DEPARTAMENTO ASTROFISICA"
+  2  ;
+ERROR:
+ORA-01740: missing double quote in identifier 
+
+
+SQL> SELECT COUNT(P) "PROFESORES DEL DEPARTAMENTO ASTROFISICA"
+  2  FROM DEPARTAMENTO NATURAL JOIN AREA NATURAL JOIN PROFESOR
+  3  WHERE D = 'ASTROFISICA';
+
+PROFESORES DEL DEPARTAMENTO ASTROFISICA                                         
+---------------------------------------                                         
+                                      1                                         
+
+SQL> -- APARTADO 8:
+SQL> SELECT D, COUNT(P) "NUMERO DE PROFESORES POR DEPARTAMENTO"
+  2  FROM DEPARTAMENTO NATURAL JOIN AREA NATURAL JOIN PROFESOR
+  3  GROUP BY D
+  4  ORDER BY D ASC;
+
+D                                                                               
+------------------------------------------------------------                    
+NUMERO DE PROFESORES POR DEPARTAMENTO                                           
+-------------------------------------                                           
+ANALISIS MATEMATICO                                                             
+                                    4                                           
+                                                                                
+ASTROFISICA                                                                     
+                                    1                                           
+                                                                                
+ESTADISTICA, INVESTIGACION OPERATIVA Y COMPUTACION                              
+                                    8                                           
+                                                                                
+
+D                                                                               
+------------------------------------------------------------                    
+NUMERO DE PROFESORES POR DEPARTAMENTO                                           
+-------------------------------------                                           
+MATEMATICA FUNDAMENTAL                                                          
+                                    1                                           
+                                                                                
+
+SQL> SET LINESIZE 300
+SQL> SET PAGESIZE 300
+SQL> RUN;
+  1  SELECT D, COUNT(P) "NUMERO DE PROFESORES POR DEPARTAMENTO"
+  2  FROM DEPARTAMENTO NATURAL JOIN AREA NATURAL JOIN PROFESOR
+  3  GROUP BY D
+  4* ORDER BY D ASC
+
+D                                                            NUMERO DE PROFESORES POR DEPARTAMENTO                                                                                                                                                                                                          
+------------------------------------------------------------ -------------------------------------                                                                                                                                                                                                          
+ANALISIS MATEMATICO                                                                              4                                                                                                                                                                                                          
+ASTROFISICA                                                                                      1                                                                                                                                                                                                          
+ESTADISTICA, INVESTIGACION OPERATIVA Y COMPUTACION                                               8                                                                                                                                                                                                          
+MATEMATICA FUNDAMENTAL                                                                           1                                                                                                                                                                                                          
+
+SQL> -- APARTADO 9:
+SQL> SELECT COUNT(T) "CANTIDAD DE TITULACIONES IMPARTIDAS POR DEPARTAMENTO DE ESTADISTICA, INVESTIGACION OPERATIVA Y COMPUTACION"
+  2  FROM ASIGNATURA NATURAL JOIN DEPARTAMENTO NATURAL JOIN AREA
+  3  WHERE D = 'ESTADISTICA, INVESTIGACION OPERATIVA Y COMPUTACION';
+
+CANTIDAD DE TITULACIONES IMPARTIDAS POR DEPARTAMENTO DE ESTADISTICA, INVESTIGACION OPERATIVA Y COMPUTACION                                                                                                                                                                                                  
+----------------------------------------------------------------------------------------------------------                                                                                                                                                                                                  
+                                                                                                         7                                                                                                                                                                                                  
+
+SQL> SELECT COUNT(DISTINCT T) "CANTIDAD DE TITULACIONES IMPARTIDAS POR DEPARTAMENTO DE ESTADISTICA, INVESTIGACION OPERATIVA Y COMPUTACION"
+  2  FROM ASIGNATURA NATURAL JOIN DEPARTAMENTO NATURAL JOIN AREA
+  3  WHERE D = 'ESTADISTICA, INVESTIGACION OPERATIVA Y COMPUTACION';
+
+CANTIDAD DE TITULACIONES IMPARTIDAS POR DEPARTAMENTO DE ESTADISTICA, INVESTIGACION OPERATIVA Y COMPUTACION                                                                                                                                                                                                  
+----------------------------------------------------------------------------------------------------------                                                                                                                                                                                                  
+                                                                                                         2                                                                                                                                                                                                  
+
+SQL> -- APARTADO 10:
+SQL> SELECT COUNT(P) "PROFESORES ADSCRITOS A AREAS QUE COMIENZAN POR A"
+  2  FROM PROFESOR NATURAL JOIN AREA
+  3  WHERE AR LIKE 'A%';
+
+PROFESORES ADSCRITOS A AREAS QUE COMIENZAN POR A                                                                                                                                                                                                                                                            
+------------------------------------------------                                                                                                                                                                                                                                                            
+                                               3                                                                                                                                                                                                                                                            
+
+SQL> -- APARTADO 11:
+SQL> SELECT DISTINCT T, COUNT(A) "CANTIDAD DE ASIGNATURAS"
+  2  FROM ASIGNATURA
+  3  GROUP BY T
+  4  ORDER BY T ASC;
+
+T    CANTIDAD DE ASIGNATURAS                                                                                                                                                                                                                                                                                
+---- -----------------------                                                                                                                                                                                                                                                                                
+GF                         1                                                                                                                                                                                                                                                                                
+GII                        7                                                                                                                                                                                                                                                                                
+GM                         2                                                                                                                                                                                                                                                                                
+MII                        2                                                                                                                                                                                                                                                                                
+
+SQL> -- APARTADO 12:
+SQL> SELECT A "ASIGNATURA CON MAYOR CREDITOS TEORICOS"
+  2  FROM ASIGNATURA
+  3  WHERE CT = (SELECT MAX(CT) FROM ASIGNATURA);
+
+ASIGNATURA CON MAYOR CREDITOS TEORICOS                                                                                                                                                                                                                                                                      
+--------------------------------------------------                                                                                                                                                                                                                                                          
+DIDACTICA DE LA MATEMATICA                                                                                                                                                                                                                                                                                  
+
+SQL> -- APARTADO 13:
+SQL> SELECT A "ASIGNATURA CON MENOR CREDITO TEORICO"
+  2  FROM ASIGNATURA
+  3  WHERE CT = (SELECT MIN(CT) FROM ASIGNATURA);
+
+ASIGNATURA CON MENOR CREDITO TEORICO                                                                                                                                                                                                                                                                        
+--------------------------------------------------                                                                                                                                                                                                                                                          
+INTELIGENCIA ARTIFICIAL                                                                                                                                                                                                                                                                                     
+ALMACENES DE DATOS                                                                                                                                                                                                                                                                                          
+MINERIA DE DATOS                                                                                                                                                                                                                                                                                            
+
+SQL> -- APARTADO 14:
+SQL> SELECT A "ASIGNATURA", CT+CP+CL "CREDITOS TOTALES"
+  2  FROM ASIGNATURA
+  3  ORDER BY A ASC;
+
+ASIGNATURA                                         CREDITOS TOTALES                                                                                                                                                                                                                                         
+-------------------------------------------------- ----------------                                                                                                                                                                                                                                         
+ALGEBRA                                                           6                                                                                                                                                                                                                                         
+ALMACENES DE DATOS                                                3                                                                                                                                                                                                                                         
+ANALISIS COMPLEJO                                               7.5                                                                                                                                                                                                                                         
+ASTRONOMIA                                                        6                                                                                                                                                                                                                                         
+BASES DE DATOS                                                    6                                                                                                                                                                                                                                         
+CALCULO                                                           6                                                                                                                                                                                                                                         
+DIDACTICA DE LA MATEMATICA                                        6                                                                                                                                                                                                                                         
+GESTION DE RIESGOS                                                6                                                                                                                                                                                                                                         
+INFORMATICA BASICA                                                6                                                                                                                                                                                                                                         
+INTELIGENCIA ARTIFICIAL                                           6                                                                                                                                                                                                                                         
+MINERIA DE DATOS                                                  3                                                                                                                                                                                                                                         
+OPTIMIZACION                                                      6                                                                                                                                                                                                                                         
+
+12 rows selected.
+
+SQL> SELECT A "ASIGNATURA", CT+CP+CL "CREDITOS TOTALES"
+  2  ;
+
+*
+ERROR at line 2:
+ORA-00923: FROM keyword not found where expected 
+
+
+SQL> -- APARTADO 15:
+SQL> SELECT A "ASIGNATURA CON MAYOR NUMERO DE CREDITOS"
+  2  FROM ASIGNATURA
+  3  WHERE CT+CP+CL = (SELECT MAX(CT+CP+CL) FROM ASIGNATURA);
+
+ASIGNATURA CON MAYOR NUMERO DE CREDITOS                                                                                                                                                                                                                                                                     
+--------------------------------------------------                                                                                                                                                                                                                                                          
+ANALISIS COMPLEJO                                                                                                                                                                                                                                                                                           
+
+SQL> -- APARTADO 16:
+SQL> SELECT A "ASIGNATURA CON MENOR NUMERO DE CREDITOS"
+  2  FROM ASIGNATURA
+  3  WHERE CT+CP+CL = (SELECT MIN(CT+CP+CL) FROM ASIGNATURA);
+
+ASIGNATURA CON MENOR NUMERO DE CREDITOS                                                                                                                                                                                                                                                                     
+--------------------------------------------------                                                                                                                                                                                                                                                          
+ALMACENES DE DATOS                                                                                                                                                                                                                                                                                          
+MINERIA DE DATOS                                                                                                                                                                                                                                                                                            
+
+SQL> -- APARTADO 17:
+SQL> SELECT AR "AREA CON LA ASIGNATURA DE MAS CREDITOS"
+  2  FROM ASIGNATURA NATURAL JOIN AREA
+  3  WHERE CT+CP+CL = (SELECT MAX(CT+CP+CL) FROM ASIGNATURA);
+
+AREA CON LA ASIGNATURA DE MAS CREDITOS                                                                                                                                                                                                                                                                      
+------------------------------------------------------------                                                                                                                                                                                                                                                
+ANALISIS MATEMATICO                                                                                                                                                                                                                                                                                         
+
+SQL> -- APARTADO 18:
+SQL> SELECT COUNT(A) "ASIGNATURAS IMPARTIDAS POR EL PROFESOR 1111"
+  2  FROM ASIGNATURA NATURAL JOIN PLAN_DOCENTE
+  3  WHERE DNI = 1111;
+
+ASIGNATURAS IMPARTIDAS POR EL PROFESOR 1111                                                                                                                                                                                                                                                                 
+-------------------------------------------                                                                                                                                                                                                                                                                 
+                                          2                                                                                                                                                                                                                                                                 
+
+SQL> SELECT COUNT(DISTINCT A) "ASIGNATURAS IMPARTIDAS POR EL PROFESOR 1111"
+  2  FROM ASIGNATURA NATURAL JOIN PLAN_DOCENTE
+  3  WHERE DNI = 1111;
+
+ASIGNATURAS IMPARTIDAS POR EL PROFESOR 1111                                                                                                                                                                                                                                                                 
+-------------------------------------------                                                                                                                                                                                                                                                                 
+                                          1                                                                                                                                                                                                                                                                 
+
+SQL> -- APARTADO 19:
+SQL> SELECT SUM(CTA+CPA+CLA) "TOTAL CREDITOS IMPARTIDOS POR EL PROFESOR 1111"
+  2  FROM ASIGNATURA NATURAL JOIN PLAN_DOCENTE
+  3  WHERE DNI = 1111;
+
+TOTAL CREDITOS IMPARTIDOS POR EL PROFESOR 1111                                                                                                                                                                                                                                                              
+----------------------------------------------                                                                                                                                                                                                                                                              
+                                             9                                                                                                                                                                                                                                                              
+
+SQL> -- APARTADO 20:
+SQL> SELECT P
+  2  FROM PLAN_DOCENTE NATURAL JOIN PROFESOR
+  3  WHERE(CTA+CPA+CLA) = (SELECT MAX(CTA+CPA+CLA) FROM PLAN_DOCENTE WHERE FF IS NULL);
+
+P                                                                                                                                                                                                                                                                                                           
+------------------------------------------------------------                                                                                                                                                                                                                                                
+MARIO                                                                                                                                                                                                                                                                                                       
+
+SQL> -- APARTADO 21:
+SQL> SELECT AVG(COUNT(A))
+  2  FROM ASIGNATURA NATURAL JOIN AREA
+  3  GROUP BY AR;
+
+AVG(COUNT(A))                                                                                                                                                                                                                                                                                               
+-------------                                                                                                                                                                                                                                                                                               
+          1.5                                                                                                                                                                                                                                                                                               
+
+SQL> -- APARTADO 22:
+SQL> SELECT AVG((COUNT(DISTINCT P))) "NUMERO MEDIO DE PROFESORES EN CADA DEPARTAMENTO"
+  2  FROM PROFESOR NATURAL JOIN AREA
+  3  GROUP BY CD;
+
+NUMERO MEDIO DE PROFESORES EN CADA DEPARTAMENTO                                                                                                                                                                                                                                                             
+-----------------------------------------------                                                                                                                                                                                                                                                             
+                                            3.5                                                                                                                                                                                                                                                             
+
+SQL> -- APARTADO 23:
+SQL> SELECT AR "AREAS CON MAS DE TRES ASIGNATURAS"
+  2  FROM AREA NATURAL JOIN ASIGNATURA
+  3  GROUP BY AR
+  4  HAVING COUNT(A)>3;
+
+AREAS CON MAS DE TRES ASIGNATURAS                                                                                                                                                                                                                                                                           
+------------------------------------------------------------                                                                                                                                                                                                                                                
+LENGUAJES Y SISTEMAS INFORMATICOS                                                                                                                                                                                                                                                                           
+
+SQL> -- APARTADO 24:
+SQL> SELECT AR "AREAS CON MAS DE SEIS ASIGNATURAS"
+  2  FROM AREA NATURAL JOIN ASIGNATURA
+  3  GROUP BY AR
+  4  HAVING COUNT(A)>6;
+
+no rows selected
+
+SQL> -- APARTADO 25:
+SQL> SELECT D "DEPARTAMENTO CON MENOS PROFESORES ASIGNADOS"
+  2  FROM DEPARTAMENTO NATURAL JOIN AREA NATURAL JOIN PROFESOR
+  3  GROUP BY D
+  4  HAVING COUNT(DNI) = (SELECT MIN(COUNT(DNI)) FROM DEPARTAMENTO NATURAL JOIN AREA NATURAL JOIN PROFESOR GROUP BY D);
+
+DEPARTAMENTO CON MENOS PROFESORES ASIGNADOS                                                                                                                                                                                                                                                                 
+------------------------------------------------------------                                                                                                                                                                                                                                                
+ASTROFISICA                                                                                                                                                                                                                                                                                                 
+MATEMATICA FUNDAMENTAL                                                                                                                                                                                                                                                                                      
+
+SQL> SPOOL
+currently spooling to PRACT6.lst
+SQL> SPOOL OFF
