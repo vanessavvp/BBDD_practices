@@ -1,0 +1,848 @@
+SQL> SPOOL
+currently spooling to PRACT8.lst
+SQL> /* PRACTICA 8 - DEFINICION DE DATOS Y AUTORIZACIONES
+SQL> FAMILIARIZARSE CON LAS PRINCIPALES INSTRUCCIONES DE DEFINICION DE DATOS Y CONTROL
+SQL> DE DATOS RELATIVAS A AUTORIZACIONES
+SQL> 
+SQL> ASIGNATURA: BASES DE DATOS
+SQL> AUTORA: VANESSA VALENTINA VILLALBA PEREZ
+SQL> UNIVERSIDAD DE LA LAGUNA: */
+SQL> -- APARTADO 1:
+SQL> CREATE TABLE TITULACION
+  2  (T CHAR(4) PRIMARY KEY,
+  3  FAC VARCHAR2(60));
+
+Table created.
+
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> -- APARTADO 2:
+SQL> INSERT INTO TITULACION(T)
+  2  SELECT DISTINCT T
+  3  FROM ASIGNATURA;
+
+4 rows created.
+
+SQL> -- APARTADO 3:
+SQL> SELECT *
+  2  FROM TITULACION;
+
+T    FAC                                                                        
+---- ------------------------------------------------------------               
+GF                                                                              
+GM                                                                              
+GII                                                                             
+MII                                                                             
+
+SQL> -- APARTADO 4:
+SQL> UPDATE TITULACION
+  2  SET FAC = "ESIT"
+  3  WHERE T = "GII" AND T = "MII";
+WHERE T = "GII" AND T = "MII"
+                        *
+ERROR at line 3:
+ORA-00904: "MII": invalid identifier 
+
+
+SQL> -- CORRECCION APARTADO 4:
+SQL> UPDATE TITULACION
+  2  SET FAC = "ESIT"
+  3  WHERE T = "GII" OR T = "MII";
+WHERE T = "GII" OR T = "MII"
+                       *
+ERROR at line 3:
+ORA-00904: "MII": invalid identifier 
+
+
+SQL> UPDATE TITULACION
+  2  SET FAC = 'ESIT'
+  3  WHERE T = 'GII' OR T = 'MII';
+
+2 rows updated.
+
+SQL> UPDATE TITULACION
+  2  SET FAC = 'FACULTAD DE CIENCIAS'
+  3  WHERE T = 'GF' OR T = 'GM';
+
+2 rows updated.
+
+SQL> -- APARTADO 5:
+SQL> GRANT CREATE SYNONYM TO ALU0101265704
+  2  ;
+GRANT CREATE SYNONYM TO ALU0101265704
+*
+ERROR at line 1:
+ORA-01031: insufficient privileges 
+
+
+SQL> CREATE SYNONYM TIT
+  2  FROM TITULACION;
+FROM TITULACION
+*
+ERROR at line 2:
+ORA-00905: missing keyword 
+
+
+SQL> -- CORRECCION APARTADO 5:
+SQL> CREATE SYNONYM TIT
+  2  FOR TITULACION;
+
+Synonym created.
+
+SQL> -- APARTADO 6:
+SQL> SELECT *
+  2  FROM TIT;
+
+T    FAC                                                                        
+---- ------------------------------------------------------------               
+GF   FACULTAD DE CIENCIAS                                                       
+GM   FACULTAD DE CIENCIAS                                                       
+GII  ESIT                                                                       
+MII  ESIT                                                                       
+
+SQL> SPOOL
+currently spooling to PRACT8.lst
+SQL> -- APARTADO 7:
+SQL> ALTER TABLE ASIGNATURA
+  2  ADD FOREIGN KEY(T) REFERENCES TITULACION(T) ON DELETE CASCADE;
+
+Table altered.
+
+SQL> -- APARTADO 8:
+SQL> ALTER TABLE TITULACION
+  2  MODIFY(T CHAR(6));
+ALTER TABLE TITULACION
+*
+ERROR at line 1:
+ORA-02292: integrity constraint (ALU0101265704.SYS_C00221331) violated - child 
+record found 
+
+
+SQL> -- PARA DESACTIVAR LA CONDICION DE INTEGRIDAD:
+SQL> ALTER TABLE ASIGNATURA
+  2  DISABLE CONSTRAINT SYS_C00221331;
+
+Table altered.
+
+SQL> -- ACTIVAR CONDICION DE INTEGRIDAD
+SQL> ALTER TABLE ASIGNATURA
+  2  ENABLE CONSTRAINT SYS_C00221331;
+
+Table altered.
+
+SQL> ALTER TABLE ASIGNATURA
+  2  DISABLE CONSTRAINT SYS_C00221331;
+
+Table altered.
+
+SQL> ALTER TABLE TITULACION
+  2  MODIFY(T CHAT(6));
+MODIFY(T CHAT(6))
+             *
+ERROR at line 2:
+ORA-00907: missing right parenthesis 
+
+
+SQL> ALTER TABLE TITULACION
+  2  MODIFY(T CHAR(6));
+
+Table altered.
+
+SQL> ALTER TABLE TITULACION
+  2  ;
+
+*
+ERROR at line 2:
+ORA-02210: no options specified for ALTER TABLE 
+
+
+SQL> ALTER TABLE ASIGNATURA
+  2  ENABLE CONSTRAINT SYS_C00221331;
+
+Table altered.
+
+SQL> -- APARTADO 10:
+SQL> CREATE VIEW VISTA1
+  2  AS (SELECT CAS, A, T, CUR, CAR FROM ASIGNATURA);
+
+View created.
+
+SQL> -- CORRECION, EL APARTADO REALIZACO FUE EL 9:
+SQL> -- APARTADO 10:
+SQL> CREATE VIEW VISTA1
+  2  AS (SELECT CAS, A, T, CUR, CAR FROM ASIGNATURA);
+CREATE VIEW VISTA1
+            *
+ERROR at line 1:
+ORA-00955: name is already used by an existing object 
+
+
+SQL> SELECT *
+  2  FROM VISTA1;
+
+       CAS A                                                  T           CUR   
+---------- -------------------------------------------------- ---- ----------   
+       CAR                                                                      
+----------                                                                      
+         1 BASES DE DATOS                                     GII           3   
+         7                                                                      
+                                                                                
+         2 INTELIGENCIA ARTIFICIAL                            GII           3   
+         4                                                                      
+                                                                                
+         3 ALMACENES DE DATOS                                 MII           1   
+         7                                                                      
+                                                                                
+
+       CAS A                                                  T           CUR   
+---------- -------------------------------------------------- ---- ----------   
+       CAR                                                                      
+----------                                                                      
+         4 MINERIA DE DATOS                                   MII           1   
+         7                                                                      
+                                                                                
+         5 INFORMATICA BASICA                                 GII           1   
+         7                                                                      
+                                                                                
+         6 ALGEBRA                                            GII           1   
+         1                                                                      
+                                                                                
+
+       CAS A                                                  T           CUR   
+---------- -------------------------------------------------- ---- ----------   
+       CAR                                                                      
+----------                                                                      
+         7 CALCULO                                            GII           1   
+         8                                                                      
+                                                                                
+         8 OPTIMIZACION                                       GII           1   
+         6                                                                      
+                                                                                
+         9 GESTION DE RIESGOS                                 GII           3   
+         4                                                                      
+                                                                                
+
+       CAS A                                                  T           CUR   
+---------- -------------------------------------------------- ---- ----------   
+       CAR                                                                      
+----------                                                                      
+        10 ASTRONOMIA                                         GF            2   
+         3                                                                      
+                                                                                
+        11 DIDACTICA DE LA MATEMATICA                         GM            2   
+         5                                                                      
+                                                                                
+        12 ANALISIS COMPLEJO                                  GM            4   
+         2                                                                      
+                                                                                
+
+12 rows selected.
+
+SQL> SET LINESIZE 400
+SQL> SET PAGESIZE 400
+SQL> RUN;
+  1  SELECT *
+  2* FROM VISTA1
+
+       CAS A                                                  T           CUR        CAR                                                                                                                                                                                                                                                                                                                        
+---------- -------------------------------------------------- ---- ---------- ----------                                                                                                                                                                                                                                                                                                                        
+         1 BASES DE DATOS                                     GII           3          7                                                                                                                                                                                                                                                                                                                        
+         2 INTELIGENCIA ARTIFICIAL                            GII           3          4                                                                                                                                                                                                                                                                                                                        
+         3 ALMACENES DE DATOS                                 MII           1          7                                                                                                                                                                                                                                                                                                                        
+         4 MINERIA DE DATOS                                   MII           1          7                                                                                                                                                                                                                                                                                                                        
+         5 INFORMATICA BASICA                                 GII           1          7                                                                                                                                                                                                                                                                                                                        
+         6 ALGEBRA                                            GII           1          1                                                                                                                                                                                                                                                                                                                        
+         7 CALCULO                                            GII           1          8                                                                                                                                                                                                                                                                                                                        
+         8 OPTIMIZACION                                       GII           1          6                                                                                                                                                                                                                                                                                                                        
+         9 GESTION DE RIESGOS                                 GII           3          4                                                                                                                                                                                                                                                                                                                        
+        10 ASTRONOMIA                                         GF            2          3                                                                                                                                                                                                                                                                                                                        
+        11 DIDACTICA DE LA MATEMATICA                         GM            2          5                                                                                                                                                                                                                                                                                                                        
+        12 ANALISIS COMPLEJO                                  GM            4          2                                                                                                                                                                                                                                                                                                                        
+
+12 rows selected.
+
+SQL> -- APARTADO 11:
+SQL> INSERT INTO VISTA1
+  2  VALUES(13,'ESTADISTICA','GII',3,7);
+INSERT INTO VISTA1
+*
+ERROR at line 1:
+ORA-02291: integrity constraint (ALU0101265704.SYS_C00221331) violated - parent key not found 
+
+
+SQL> ALTER TABLE ASIGNATURA
+  2  DISABLE CONSTRAINT SYS_C00221331;
+
+Table altered.
+
+SQL> INSERT INTO VISTA1
+  2  VALUES(13,'ESTADISTICA','GII',3,7);
+
+1 row created.
+
+SQL> -- APARTADO 12:
+SQL> SELECT *
+  2  FROM VISTA1;
+
+       CAS A                                                  T           CUR        CAR                                                                                                                                                                                                                                                                                                                        
+---------- -------------------------------------------------- ---- ---------- ----------                                                                                                                                                                                                                                                                                                                        
+        13 ESTADISTICA                                        GII           3          7                                                                                                                                                                                                                                                                                                                        
+         1 BASES DE DATOS                                     GII           3          7                                                                                                                                                                                                                                                                                                                        
+         2 INTELIGENCIA ARTIFICIAL                            GII           3          4                                                                                                                                                                                                                                                                                                                        
+         3 ALMACENES DE DATOS                                 MII           1          7                                                                                                                                                                                                                                                                                                                        
+         4 MINERIA DE DATOS                                   MII           1          7                                                                                                                                                                                                                                                                                                                        
+         5 INFORMATICA BASICA                                 GII           1          7                                                                                                                                                                                                                                                                                                                        
+         6 ALGEBRA                                            GII           1          1                                                                                                                                                                                                                                                                                                                        
+         7 CALCULO                                            GII           1          8                                                                                                                                                                                                                                                                                                                        
+         8 OPTIMIZACION                                       GII           1          6                                                                                                                                                                                                                                                                                                                        
+         9 GESTION DE RIESGOS                                 GII           3          4                                                                                                                                                                                                                                                                                                                        
+        10 ASTRONOMIA                                         GF            2          3                                                                                                                                                                                                                                                                                                                        
+        11 DIDACTICA DE LA MATEMATICA                         GM            2          5                                                                                                                                                                                                                                                                                                                        
+        12 ANALISIS COMPLEJO                                  GM            4          2                                                                                                                                                                                                                                                                                                                        
+
+13 rows selected.
+
+SQL> -- APARTADO 13:
+SQL> SELECT *
+  2  FROM ASIGNATURA;
+
+       CAS A                                                  T           CUR        CAR         CT         CP         CL                                                                                                                                                                                                                                                                                       
+---------- -------------------------------------------------- ---- ---------- ---------- ---------- ---------- ----------                                                                                                                                                                                                                                                                                       
+        13 ESTADISTICA                                        GII           3          7          0          0          0                                                                                                                                                                                                                                                                                       
+         1 BASES DE DATOS                                     GII           3          7          3        1.5        1.5                                                                                                                                                                                                                                                                                       
+         2 INTELIGENCIA ARTIFICIAL                            GII           3          4        1.5        1.5          3                                                                                                                                                                                                                                                                                       
+         3 ALMACENES DE DATOS                                 MII           1          7        1.5          0        1.5                                                                                                                                                                                                                                                                                       
+         4 MINERIA DE DATOS                                   MII           1          7        1.5          0        1.5                                                                                                                                                                                                                                                                                       
+         5 INFORMATICA BASICA                                 GII           1          7          3        1.5        1.5                                                                                                                                                                                                                                                                                       
+         6 ALGEBRA                                            GII           1          1          3          3          0                                                                                                                                                                                                                                                                                       
+         7 CALCULO                                            GII           1          8          3          3          0                                                                                                                                                                                                                                                                                       
+         8 OPTIMIZACION                                       GII           1          6          3        1.5        1.5                                                                                                                                                                                                                                                                                       
+         9 GESTION DE RIESGOS                                 GII           3          4          3          0          3                                                                                                                                                                                                                                                                                       
+        10 ASTRONOMIA                                         GF            2          3          3        1.5        1.5                                                                                                                                                                                                                                                                                       
+        11 DIDACTICA DE LA MATEMATICA                         GM            2          5          6          0          0                                                                                                                                                                                                                                                                                       
+        12 ANALISIS COMPLEJO                                  GM            4          2        4.5          3          0                                                                                                                                                                                                                                                                                       
+
+13 rows selected.
+
+SQL> -- APARTADO 14:
+SQL> UPDATE VISTA1
+  2  SET CAR = 6;
+
+13 rows updated.
+
+SQL> UNDO;
+SP2-0042: unknown command "UNDO" - rest of line ignored.
+SQL> UNDO UPDATE VISTA1 SET CAR = 6;
+SP2-0734: unknown command beginning "UNDO UPDAT..." - rest of line ignored.
+SQL> ROLLBACK;
+
+Rollback complete.
+
+SQL> SELECT *
+  2  FROM ASIGNATURA;
+
+       CAS A                                                  T           CUR        CAR         CT         CP         CL                                                                                                                                                                                                                                                                                       
+---------- -------------------------------------------------- ---- ---------- ---------- ---------- ---------- ----------                                                                                                                                                                                                                                                                                       
+         1 BASES DE DATOS                                     GII           3          7          3        1.5        1.5                                                                                                                                                                                                                                                                                       
+         2 INTELIGENCIA ARTIFICIAL                            GII           3          4        1.5        1.5          3                                                                                                                                                                                                                                                                                       
+         3 ALMACENES DE DATOS                                 MII           1          7        1.5          0        1.5                                                                                                                                                                                                                                                                                       
+         4 MINERIA DE DATOS                                   MII           1          7        1.5          0        1.5                                                                                                                                                                                                                                                                                       
+         5 INFORMATICA BASICA                                 GII           1          7          3        1.5        1.5                                                                                                                                                                                                                                                                                       
+         6 ALGEBRA                                            GII           1          1          3          3          0                                                                                                                                                                                                                                                                                       
+         7 CALCULO                                            GII           1          8          3          3          0                                                                                                                                                                                                                                                                                       
+         8 OPTIMIZACION                                       GII           1          6          3        1.5        1.5                                                                                                                                                                                                                                                                                       
+         9 GESTION DE RIESGOS                                 GII           3          4          3          0          3                                                                                                                                                                                                                                                                                       
+        10 ASTRONOMIA                                         GF            2          3          3        1.5        1.5                                                                                                                                                                                                                                                                                       
+        11 DIDACTICA DE LA MATEMATICA                         GM            2          5          6          0          0                                                                                                                                                                                                                                                                                       
+        12 ANALISIS COMPLEJO                                  GM            4          2        4.5          3          0                                                                                                                                                                                                                                                                                       
+
+12 rows selected.
+
+SQL> SELECT *
+  2  FROM TITULACION;
+
+T      FAC                                                                                                                                                                                                                                                                                                                                                                                                      
+------ ------------------------------------------------------------                                                                                                                                                                                                                                                                                                                                             
+GF     FACULTAD DE CIENCIAS                                                                                                                                                                                                                                                                                                                                                                                     
+GM     FACULTAD DE CIENCIAS                                                                                                                                                                                                                                                                                                                                                                                     
+GII    ESIT                                                                                                                                                                                                                                                                                                                                                                                                     
+MII    ESIT                                                                                                                                                                                                                                                                                                                                                                                                     
+
+SQL> SELECT *
+  2  FROM TIT;
+
+T      FAC                                                                                                                                                                                                                                                                                                                                                                                                      
+------ ------------------------------------------------------------                                                                                                                                                                                                                                                                                                                                             
+GF     FACULTAD DE CIENCIAS                                                                                                                                                                                                                                                                                                                                                                                     
+GM     FACULTAD DE CIENCIAS                                                                                                                                                                                                                                                                                                                                                                                     
+GII    ESIT                                                                                                                                                                                                                                                                                                                                                                                                     
+MII    ESIT                                                                                                                                                                                                                                                                                                                                                                                                     
+
+SQL> SELECT *
+  2  FROM VISTA1;
+
+       CAS A                                                  T           CUR        CAR                                                                                                                                                                                                                                                                                                                        
+---------- -------------------------------------------------- ---- ---------- ----------                                                                                                                                                                                                                                                                                                                        
+         1 BASES DE DATOS                                     GII           3          7                                                                                                                                                                                                                                                                                                                        
+         2 INTELIGENCIA ARTIFICIAL                            GII           3          4                                                                                                                                                                                                                                                                                                                        
+         3 ALMACENES DE DATOS                                 MII           1          7                                                                                                                                                                                                                                                                                                                        
+         4 MINERIA DE DATOS                                   MII           1          7                                                                                                                                                                                                                                                                                                                        
+         5 INFORMATICA BASICA                                 GII           1          7                                                                                                                                                                                                                                                                                                                        
+         6 ALGEBRA                                            GII           1          1                                                                                                                                                                                                                                                                                                                        
+         7 CALCULO                                            GII           1          8                                                                                                                                                                                                                                                                                                                        
+         8 OPTIMIZACION                                       GII           1          6                                                                                                                                                                                                                                                                                                                        
+         9 GESTION DE RIESGOS                                 GII           3          4                                                                                                                                                                                                                                                                                                                        
+        10 ASTRONOMIA                                         GF            2          3                                                                                                                                                                                                                                                                                                                        
+        11 DIDACTICA DE LA MATEMATICA                         GM            2          5                                                                                                                                                                                                                                                                                                                        
+        12 ANALISIS COMPLEJO                                  GM            4          2                                                                                                                                                                                                                                                                                                                        
+
+12 rows selected.
+
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> SPOOL
+currently spooling to PRACT8.lst
+SQL> -- EMPEZANDO DESDE EL APARTADO 11:
+SQL> INSERT INTO VISTA 1
+  2  ;
+INSERT INTO VISTA 1
+                  *
+ERROR at line 1:
+ORA-00926: missing VALUES keyword 
+
+
+SQL> INSERT INTO VISTA1
+  2  VALUES(13,'ESTADISTICA','GII',3,7);
+
+1 row created.
+
+SQL> SELECT *
+  2  FROM VISTA1;
+
+       CAS A                                                  T           CUR        CAR                                                                                                                                                                                                                                                                                                                        
+---------- -------------------------------------------------- ---- ---------- ----------                                                                                                                                                                                                                                                                                                                        
+        13 ESTADISTICA                                        GII           3          7                                                                                                                                                                                                                                                                                                                        
+         1 BASES DE DATOS                                     GII           3          7                                                                                                                                                                                                                                                                                                                        
+         2 INTELIGENCIA ARTIFICIAL                            GII           3          4                                                                                                                                                                                                                                                                                                                        
+         3 ALMACENES DE DATOS                                 MII           1          7                                                                                                                                                                                                                                                                                                                        
+         4 MINERIA DE DATOS                                   MII           1          7                                                                                                                                                                                                                                                                                                                        
+         5 INFORMATICA BASICA                                 GII           1          7                                                                                                                                                                                                                                                                                                                        
+         6 ALGEBRA                                            GII           1          1                                                                                                                                                                                                                                                                                                                        
+         7 CALCULO                                            GII           1          8                                                                                                                                                                                                                                                                                                                        
+         8 OPTIMIZACION                                       GII           1          6                                                                                                                                                                                                                                                                                                                        
+         9 GESTION DE RIESGOS                                 GII           3          4                                                                                                                                                                                                                                                                                                                        
+        10 ASTRONOMIA                                         GF            2          3                                                                                                                                                                                                                                                                                                                        
+        11 DIDACTICA DE LA MATEMATICA                         GM            2          5                                                                                                                                                                                                                                                                                                                        
+        12 ANALISIS COMPLEJO                                  GM            4          2                                                                                                                                                                                                                                                                                                                        
+
+13 rows selected.
+
+SQL> SELECT *
+  2  FROM ASIGNATURA;
+
+       CAS A                                                  T           CUR        CAR         CT         CP         CL                                                                                                                                                                                                                                                                                       
+---------- -------------------------------------------------- ---- ---------- ---------- ---------- ---------- ----------                                                                                                                                                                                                                                                                                       
+        13 ESTADISTICA                                        GII           3          7          0          0          0                                                                                                                                                                                                                                                                                       
+         1 BASES DE DATOS                                     GII           3          7          3        1.5        1.5                                                                                                                                                                                                                                                                                       
+         2 INTELIGENCIA ARTIFICIAL                            GII           3          4        1.5        1.5          3                                                                                                                                                                                                                                                                                       
+         3 ALMACENES DE DATOS                                 MII           1          7        1.5          0        1.5                                                                                                                                                                                                                                                                                       
+         4 MINERIA DE DATOS                                   MII           1          7        1.5          0        1.5                                                                                                                                                                                                                                                                                       
+         5 INFORMATICA BASICA                                 GII           1          7          3        1.5        1.5                                                                                                                                                                                                                                                                                       
+         6 ALGEBRA                                            GII           1          1          3          3          0                                                                                                                                                                                                                                                                                       
+         7 CALCULO                                            GII           1          8          3          3          0                                                                                                                                                                                                                                                                                       
+         8 OPTIMIZACION                                       GII           1          6          3        1.5        1.5                                                                                                                                                                                                                                                                                       
+         9 GESTION DE RIESGOS                                 GII           3          4          3          0          3                                                                                                                                                                                                                                                                                       
+        10 ASTRONOMIA                                         GF            2          3          3        1.5        1.5                                                                                                                                                                                                                                                                                       
+        11 DIDACTICA DE LA MATEMATICA                         GM            2          5          6          0          0                                                                                                                                                                                                                                                                                       
+        12 ANALISIS COMPLEJO                                  GM            4          2        4.5          3          0                                                                                                                                                                                                                                                                                       
+
+13 rows selected.
+
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> -- APARTADO 14:
+SQL> UPDATE VISTA1
+  2  SET CAR = 6
+  3  WHERE CAS = 13;
+
+1 row updated.
+
+SQL> -- APARTADO 15:
+SQL> SELECT *
+  2  FROM VISTA1;
+
+       CAS A                                                  T           CUR        CAR                                                                                                                                                                                                                                                                                                                        
+---------- -------------------------------------------------- ---- ---------- ----------                                                                                                                                                                                                                                                                                                                        
+        13 ESTADISTICA                                        GII           3          6                                                                                                                                                                                                                                                                                                                        
+         1 BASES DE DATOS                                     GII           3          7                                                                                                                                                                                                                                                                                                                        
+         2 INTELIGENCIA ARTIFICIAL                            GII           3          4                                                                                                                                                                                                                                                                                                                        
+         3 ALMACENES DE DATOS                                 MII           1          7                                                                                                                                                                                                                                                                                                                        
+         4 MINERIA DE DATOS                                   MII           1          7                                                                                                                                                                                                                                                                                                                        
+         5 INFORMATICA BASICA                                 GII           1          7                                                                                                                                                                                                                                                                                                                        
+         6 ALGEBRA                                            GII           1          1                                                                                                                                                                                                                                                                                                                        
+         7 CALCULO                                            GII           1          8                                                                                                                                                                                                                                                                                                                        
+         8 OPTIMIZACION                                       GII           1          6                                                                                                                                                                                                                                                                                                                        
+         9 GESTION DE RIESGOS                                 GII           3          4                                                                                                                                                                                                                                                                                                                        
+        10 ASTRONOMIA                                         GF            2          3                                                                                                                                                                                                                                                                                                                        
+        11 DIDACTICA DE LA MATEMATICA                         GM            2          5                                                                                                                                                                                                                                                                                                                        
+        12 ANALISIS COMPLEJO                                  GM            4          2                                                                                                                                                                                                                                                                                                                        
+
+13 rows selected.
+
+SQL> -- APARTADO 17:
+SQL> CREATE VIEW VISTA2
+  2  AS (SELECT DNI, A, T, CUT, CAR)
+  3  FROM PLAN_DOCENTE NATURAL JOIN VISTA1;
+AS (SELECT DNI, A, T, CUT, CAR)
+                              *
+ERROR at line 2:
+ORA-00923: FROM keyword not found where expected 
+
+
+SQL> CREATE VIEW VISTA2
+  2  AS (SELECT DNI, A, T, CUT, CAR
+  3  FROM PLAN_DOCENTE NATURAL JOIN VISTA1);
+AS (SELECT DNI, A, T, CUT, CAR
+                      *
+ERROR at line 2:
+ORA-00904: "CUT": invalid identifier 
+
+
+SQL> -- CORRECCION APARTADO 17:
+SQL> CREATE VIEW VISTA2
+  2  AS (SELECT DNI, A, T, CUR, CAR FROM PLAN_DOCENTE NATURAL JOIN VISTA1);
+
+View created.
+
+SQL> -- APARTADO 18:
+SQL> SELECT *
+  2  FROM VISTA2;
+
+       DNI A                                                  T           CUR        CAR                                                                                                                                                                                                                                                                                                                        
+---------- -------------------------------------------------- ---- ---------- ----------                                                                                                                                                                                                                                                                                                                        
+      1010 INTELIGENCIA ARTIFICIAL                            GII           3          4                                                                                                                                                                                                                                                                                                                        
+      3333 INTELIGENCIA ARTIFICIAL                            GII           3          4                                                                                                                                                                                                                                                                                                                        
+      2020 ALMACENES DE DATOS                                 MII           1          7                                                                                                                                                                                                                                                                                                                        
+      2222 ALMACENES DE DATOS                                 MII           1          7                                                                                                                                                                                                                                                                                                                        
+      2222 MINERIA DE DATOS                                   MII           1          7                                                                                                                                                                                                                                                                                                                        
+      5555 ALGEBRA                                            GII           1          1                                                                                                                                                                                                                                                                                                                        
+      9999 CALCULO                                            GII           1          8                                                                                                                                                                                                                                                                                                                        
+      3030 OPTIMIZACION                                       GII           1          6                                                                                                                                                                                                                                                                                                                        
+      1111 OPTIMIZACION                                       GII           1          6                                                                                                                                                                                                                                                                                                                        
+      1111 OPTIMIZACION                                       GII           1          6                                                                                                                                                                                                                                                                                                                        
+      3333 GESTION DE RIESGOS                                 GII           3          4                                                                                                                                                                                                                                                                                                                        
+      1010 GESTION DE RIESGOS                                 GII           3          4                                                                                                                                                                                                                                                                                                                        
+      1010 GESTION DE RIESGOS                                 GII           3          4                                                                                                                                                                                                                                                                                                                        
+      6666 ASTRONOMIA                                         GF            2          3                                                                                                                                                                                                                                                                                                                        
+      8888 DIDACTICA DE LA MATEMATICA                         GM            2          5                                                                                                                                                                                                                                                                                                                        
+      7777 ANALISIS COMPLEJO                                  GM            4          2                                                                                                                                                                                                                                                                                                                        
+
+16 rows selected.
+
+SQL> -- APARTADO 19:
+SQL> UPDATE VISTA2
+  2  SET A = 'SISTEMAS OPERATIVOS'
+  3  WHERE T = 'GII';
+SET A = 'SISTEMAS OPERATIVOS'
+    *
+ERROR at line 2:
+ORA-01779: cannot modify a column which maps to a non key-preserved table 
+
+
+SQL> -- APARTADO 20:
+SQL> DESCRIBE VISTA2;
+ Name                                                                                                                                                                                                                                      Null?    Type
+ ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -------- ------------------------------------------------------------------------------------------------------------------------------------------------------------
+ DNI                                                                                                                                                                                                                                       NOT NULL NUMBER(8)
+ A                                                                                                                                                                                                                                         NOT NULL VARCHAR2(50)
+ T                                                                                                                                                                                                                                         NOT NULL CHAR(4)
+ CUR                                                                                                                                                                                                                                                NUMBER(1)
+ CAR                                                                                                                                                                                                                                                NUMBER(3)
+
+SQL> SET LINESIZE 400
+SQL> SET PAGESIZE 400
+SQL> RUN;
+  1  UPDATE VISTA2
+  2  SET A = 'SISTEMAS OPERATIVOS'
+  3* WHERE T = 'GII'
+SET A = 'SISTEMAS OPERATIVOS'
+    *
+ERROR at line 2:
+ORA-01779: cannot modify a column which maps to a non key-preserved table 
+
+
+SQL> DESCRIBE VISTA2;
+ Name                                                                                                                                                                                                                                      Null?    Type
+ ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -------- ------------------------------------------------------------------------------------------------------------------------------------------------------------
+ DNI                                                                                                                                                                                                                                       NOT NULL NUMBER(8)
+ A                                                                                                                                                                                                                                         NOT NULL VARCHAR2(50)
+ T                                                                                                                                                                                                                                         NOT NULL CHAR(4)
+ CUR                                                                                                                                                                                                                                                NUMBER(1)
+ CAR                                                                                                                                                                                                                                                NUMBER(3)
+
+SQL> SET LINESIZE 380
+SQL> SET PAGESIZE 380
+SQL> RUN DESCRIBE VISTA2;
+  1  UPDATE VISTA2
+  2  SET A = 'SISTEMAS OPERATIVOS'
+  3* WHERE T = 'GII'
+SET A = 'SISTEMAS OPERATIVOS'
+    *
+ERROR at line 2:
+ORA-01779: cannot modify a column which maps to a non key-preserved table 
+
+
+SQL> DESCRIBE VISTA2;
+ Name                                                                                                                                                                                                                          Null?    Type
+ ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -------- ----------------------------------------------------------------------------------------------------------------------------------------------------
+ DNI                                                                                                                                                                                                                           NOT NULL NUMBER(8)
+ A                                                                                                                                                                                                                             NOT NULL VARCHAR2(50)
+ T                                                                                                                                                                                                                             NOT NULL CHAR(4)
+ CUR                                                                                                                                                                                                                                    NUMBER(1)
+ CAR                                                                                                                                                                                                                                    NUMBER(3)
+
+SQL> -- APARTADO 21:
+SQL> DROP VIEW VISTA1;
+
+View dropped.
+
+SQL> -- APARTADO 22;
+SQL> SELECT *
+  2  FROM VISTA2;
+FROM VISTA2
+     *
+ERROR at line 2:
+ORA-04063: view "ALU0101265704.VISTA2" has errors 
+
+
+SQL> -- APARTADO 23:
+SQL> ROLLBACK;
+
+Rollback complete.
+
+SQL> SELECT *
+  2  FROM VISTA1;
+FROM VISTA1
+     *
+ERROR at line 2:
+ORA-00942: table or view does not exist 
+
+
+SQL> -- APARTADO 24:
+SQL> CREATE INDEX INDICE1 ON PROFESOR(P);
+
+Index created.
+
+SQL> SELECT DNI
+  2  FROM PROFESOR
+  3  WHERE P = 'JUAN';
+
+       DNI                                                                                                                                                                                                                                                                                                                                                                                  
+----------                                                                                                                                                                                                                                                                                                                                                                                  
+      1111                                                                                                                                                                                                                                                                                                                                                                                  
+
+SQL> SPOOL
+currently spooling to PRACT8.lst
+SQL> -- APARTADO 25:
+SQL> DROP INDEX INDICE1;
+
+Index dropped.
+
+SQL> -- APARTADO 26:
+SQL> CREATE INDEX INDICE2 ON VISTA1(CAR);
+CREATE INDEX INDICE2 ON VISTA1(CAR)
+                        *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> -- APARTADO 27:
+SQL> GRANT SELECT ON DEPARTAMENTO TO alumno;
+
+Grant succeeded.
+
+SQL> GRANT SELECT ON AREA TO alumno;
+
+Grant succeeded.
+
+SQL> GRANT SELECT ON ASIGNATURA TO alumno;
+
+Grant succeeded.
+
+SQL> GRANT SELECT ON TITULACION TO alumno;
+
+Grant succeeded.
+
+SQL> -- APARTADO 28:
+SQL> GRANT INSERT, DELETE, UPDATE ON DEPARTAMENTO TO alumno;
+
+Grant succeeded.
+
+SQL> GRANT INSERT, DELETE, UPDATE ON AREA TO alumno;
+
+Grant succeeded.
+
+SQL> GRANT INSERT, DELETE, UPDATE ON ASIGNATURA TO alumno;
+
+Grant succeeded.
+
+SQL> GRANT INSERT, DELETE, UPDATE ON TITULACION TO alumno;
+
+Grant succeeded.
+
+SQL> -- APARTADO 29:
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> -- APARTADO 30:
+SQL> CONNECT alumno/xxxxx@ORCLPDB1
+Connected.
+SQL> -- APARTADO 31:
+SQL> SELECT *
+  2  FROM alu0101265704.DEPARTAMENTO;
+
+        CD D                                                                                                                                                                                                                                                                                                                                                                                
+---------- ------------------------------------------------------------                                                                                                                                                                                                                                                                                                                     
+         1 ANALISIS MATEMATICO                                                                                                                                                                                                                                                                                                                                                              
+         2 ASTROFISICA                                                                                                                                                                                                                                                                                                                                                                      
+         3 ESTADISTICA, INVESTIGACION OPERATIVA Y COMPUTACION                                                                                                                                                                                                                                                                                                                               
+         4 MATEMATICA FUNDAMENTAL                                                                                                                                                                                                                                                                                                                                                           
+
+SQL> -- APARTADO 32:
+SQL> SELECT *
+  2  FROM alu0101265704.PROFESOR;
+FROM alu0101265704.PROFESOR
+                   *
+ERROR at line 2:
+ORA-00942: table or view does not exist 
+
+
+SQL> -- APARTADO 33:
+SQL> INSERT INTO alu0101265704.DEPARTAMENTO
+  2  VALUE(5,'ECONOMIA');
+VALUE(5,'ECONOMIA')
+      *
+ERROR at line 2:
+ORA-00928: missing SELECT keyword 
+
+
+SQL> INSERT INTO alu0101265704.DEPARTAMENTO
+  2  VALUES(5,'ECONOMIA');
+
+1 row created.
+
+SQL> -- APARTADO 34:
+SQL> UPDATE alu0101265704.DEPARTAMENTO
+  2  SET D = 'ECONOMIA APLICADA'
+  3  WHERE CD = 5;
+
+1 row updated.
+
+SQL> -- APARTADO 35:
+SQL> UPDATE alu0101265704.TITULACION
+  2  SET FAC = 'ETSII'
+  3  WHERE T = 'GII';
+
+1 row updated.
+
+SQL> -- APARTADO 36:
+SQL> DELETE FROM alu0101265704.TITULACION
+  2  WHERE FAC = 'GII';
+
+0 rows deleted.
+
+SQL> DELETE FROM alu0101265704.TITULACION
+  2  WHERE T = 'GII';
+
+1 row deleted.
+
+SQL> -- APARTADO 37:
+SQL> ROLLBACK;
+
+Rollback complete.
+
+SQL> -- APARTADO 38:
+SQL> CREATE VIEW VISTA3
+  2  AS (SELECT A, CAR FROM alu0101265704.ASIGNATURA);
+
+View created.
+
+SQL> -- APARTADO 39:
+SQL> SELECT *
+  2  FROM VISTA3;
+
+A                                                         CAR                                                                                                                                                                                                                                                                                                                               
+-------------------------------------------------- ----------                                                                                                                                                                                                                                                                                                                               
+ESTADISTICA                                                 6                                                                                                                                                                                                                                                                                                                               
+BASES DE DATOS                                              7                                                                                                                                                                                                                                                                                                                               
+INTELIGENCIA ARTIFICIAL                                     4                                                                                                                                                                                                                                                                                                                               
+ALMACENES DE DATOS                                          7                                                                                                                                                                                                                                                                                                                               
+MINERIA DE DATOS                                            7                                                                                                                                                                                                                                                                                                                               
+INFORMATICA BASICA                                          7                                                                                                                                                                                                                                                                                                                               
+ALGEBRA                                                     1                                                                                                                                                                                                                                                                                                                               
+CALCULO                                                     8                                                                                                                                                                                                                                                                                                                               
+OPTIMIZACION                                                6                                                                                                                                                                                                                                                                                                                               
+GESTION DE RIESGOS                                          4                                                                                                                                                                                                                                                                                                                               
+ASTRONOMIA                                                  3                                                                                                                                                                                                                                                                                                                               
+DIDACTICA DE LA MATEMATICA                                  5                                                                                                                                                                                                                                                                                                                               
+ANALISIS COMPLEJO                                           2                                                                                                                                                                                                                                                                                                                               
+
+13 rows selected.
+
+SQL> -- APARTADO 40;
+SQL> DROP VIEW VISTA3;
+
+View dropped.
+
+SQL> -- APARTADO 41:
+SQL> DROP TABLE alu0101265704.ASIGNATURA
+  2  ;
+DROP TABLE alu0101265704.ASIGNATURA
+                         *
+ERROR at line 1:
+ORA-01031: insufficient privileges 
+
+
+SQL> -- APARTADO 42:
+SQL> REVOKE ALL PRIVILEGES ON DEPARTAMENTO FROM alumno;
+REVOKE ALL PRIVILEGES ON DEPARTAMENTO FROM alumno
+                                           *
+ERROR at line 1:
+ORA-01749: you may not GRANT/REVOKE privileges to/from yourself 
+
+
+SQL> SPOOL
+currently spooling to PRACT8.lst
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> SPOOL OFF
+SQL> SPOOL
+currently spooling to PRACT8.lst
+SQL> REVOKE ALL PRIVILEGES ON AREA FROM alumno;
+
+Revoke succeeded.
+
+SQL> REVOKE ALL PRIVILEGES ON ASIGNATURA FROM alumno;
+
+Revoke succeeded.
+
+SQL> REVOKE ALL PRIVILEGES ON DEPARTAMENTO FROM alumno;
+
+Revoke succeeded.
+
+SQL> REVOKE ALL PRIVILEGES ON TITULACION FROM alumno;
+
+Revoke succeeded.
+
+SQL> SPOOL
+currently spooling to PRACT8.lst
+SQL> SPOOL OFF
